@@ -1,0 +1,4 @@
+../Application/Src/control_app.c:12:13:OnFrameReceived	40	static
+../Application/Src/control_app.c:26:6:ControlApp_Init	16	static
+../Application/Src/control_app.c:37:6:ControlApp_SetWheelParameters	32	static,ignoring_inline_asm
+../Application/Src/control_app.c:47:6:ControlApp_ControlLoop_ISR	16	static

@@ -1,0 +1,4 @@
+../Drivers/CMSIS/Include/core_cm4.h:1684:22:__NVIC_EnableIRQ	2
+../MCU_Drivers/Src/mcu_uart.c:5:6:MCU_UART_Init	1
+../MCU_Drivers/Src/mcu_uart.c:24:6:USART2_IRQHandler	2
+../MCU_Drivers/Src/mcu_uart.c:30:6:MCU_UART_Send	4

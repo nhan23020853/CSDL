@@ -1,0 +1,2 @@
+../HAL/Src/platform_button.c:7:6:Platform_Button_Init	2
+../HAL/Src/platform_button.c:12:6:Platform_Button_IsPressed	5

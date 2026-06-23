@@ -1,0 +1,2 @@
+../Application/Src/protocol_handler.c:5:6:Protocol_SendTelemetry	64	static
+../Application/Src/protocol_handler.c:20:6:Protocol_SendReport	56	static

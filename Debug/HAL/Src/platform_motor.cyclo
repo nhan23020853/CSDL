@@ -1,0 +1,2 @@
+../HAL/Src/platform_motor.c:7:6:Platform_Motor_Init	1
+../HAL/Src/platform_motor.c:12:6:Platform_Motor_SetDuty	5
