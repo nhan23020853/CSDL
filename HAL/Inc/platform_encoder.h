@@ -3,6 +3,6 @@
 #include <stdint.h>
 
 void Platform_Encoder_Init(void);
-float Platform_Encoder_GetRPM(uint8_t id); // Chỉ giữ lại dòng này
+float Platform_Encoder_GetRPM(uint8_t id);
 
 #endif

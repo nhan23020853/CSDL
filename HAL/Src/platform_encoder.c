@@ -8,7 +8,7 @@
 static uint16_t prev_counts[4] = {0};
 
 void Platform_Encoder_Init(void) {
-    MCU_Encoder_Init(); // Cần đảm bảo hàm này khởi tạo 4 Timer Encoder
+    MCU_Encoder_Init();
     for(int i = 0; i < 4; i++) {
         prev_counts[i] = MCU_Encoder_GetCount(i);
     }

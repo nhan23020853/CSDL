@@ -3,6 +3,6 @@
 #include <stdint.h>
 
 void Platform_Motor_Init(void);
-void Platform_Motor_SetDuty(uint8_t id, float duty_percent); // Chỉ giữ lại dòng này
+void Platform_Motor_SetDuty(uint8_t id, float duty_percent);
 
 #endif

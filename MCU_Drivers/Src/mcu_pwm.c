@@ -1,10 +1,9 @@
 #include "mcu_pwm.h"
 #include "stm32f4xx_hal.h"
 
-extern TIM_HandleTypeDef htim2; // Giả sử tất cả 4 kênh đều nằm trên TIM2
+extern TIM_HandleTypeDef htim2;
 
 void MCU_PWM_Init(void) {
-    // Khởi động cả 4 kênh PWM
     HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);

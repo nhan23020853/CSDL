@@ -1,17 +1,12 @@
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "mcu_encoder.h"
 #include "platform_motor.h"
 #include "control_app.h"
-/* USER CODE END Includes */
 
 /**
   * @brief  The application entry point.
@@ -34,12 +29,10 @@ int main(void)
   MX_TIM4_Init();
 
   /* USER CODE BEGIN 2 */
-  // Khởi tạo các Driver của bạn
   MCU_Encoder_Init();
   Platform_Motor_Init();
   ControlApp_Init();
 
-  // Bắt đầu ngắt định thời 10ms (giả sử TIM4 được dùng cho Control Loop)
   HAL_TIM_Base_Start_IT(&htim4);
   /* USER CODE END 2 */
 

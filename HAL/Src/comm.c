@@ -53,7 +53,6 @@ void Comm_ReceiveByte(uint8_t byte) {
             temp.len |= ((uint16_t)byte << 8);
             p_idx = 0; // Reset index trước khi bắt đầu nhận payload
 
-            // Kiểm tra an toàn: Nếu len quá lớn, reset về trạng thái 0
             if (temp.len > MAX_PAYLOAD_SIZE) {
                 rx_state = 0;
             } else {
