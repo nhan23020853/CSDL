@@ -6,7 +6,7 @@ void Protocol_SendTelemetry(float rpm, float kp, float ki, float kd) {
     FrameType_t tx;
     tx.SOF = SOF_BYTE;
     tx.Type_GID = (0x02 << 4) | 0x01;
-    tx.ID = 0x21; // ID cho dữ liệu telemetry
+    tx.ID = 0x21;
     tx.len = 16;
 
     memcpy(&tx.payload[0], &rpm, 4);
