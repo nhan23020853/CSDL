@@ -12,10 +12,8 @@ void MCU_PWM_Init(void) {
 
 void MCU_PWM_SetDutyCycle_Channel(uint8_t id, uint16_t val) {
     switch(id) {
-        case 0: __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, val); break;
-        case 1: __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, val); break;
-        case 2: __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, val); break;
-        case 3: __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, val); break;
+        case 0: __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, val); break; // Cụm Trái
+        case 1: __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, val); break; // Cụm Phải
         default: break;
     }
 }

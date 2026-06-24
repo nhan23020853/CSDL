@@ -4,5 +4,6 @@
 
 void Platform_Encoder_Init(void);
 float Platform_Encoder_GetRPM(uint8_t id);
+uint16_t MCU_Encoder_GetCount(uint8_t id);
 
 #endif

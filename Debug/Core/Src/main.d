@@ -19,9 +19,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_adc.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
@@ -30,12 +27,15 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/dma.h ../Core/Inc/tim.h \
- ../Core/Inc/usart.h ../Core/Inc/gpio.h \
+ ../Core/Inc/tim.h ../Core/Inc/main.h ../Core/Inc/usart.h \
+ ../Core/Inc/gpio.h \
  D:/documentss/cosodoluong/MCU_Drivers/Inc/mcu_encoder.h \
  D:/documentss/cosodoluong/HAL/Inc/platform_motor.h \
  D:/documentss/cosodoluong/Application/Inc/control_app.h \
- D:/documentss/cosodoluong/Application/Inc/pid_controller.h
+ D:/documentss/cosodoluong/Application/Inc/pid_controller.h \
+ D:/documentss/cosodoluong/HAL/Inc/platform_encoder.h \
+ D:/documentss/cosodoluong/MCU_Drivers/Inc/mcu_gpio.h \
+ D:/documentss/cosodoluong/MCU_Drivers/Inc/mcu_uart.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -57,9 +57,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h:
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h:
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_adc.h:
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h:
@@ -68,13 +65,14 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/adc.h:
-../Core/Inc/main.h:
-../Core/Inc/dma.h:
 ../Core/Inc/tim.h:
+../Core/Inc/main.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/gpio.h:
 D:/documentss/cosodoluong/MCU_Drivers/Inc/mcu_encoder.h:
 D:/documentss/cosodoluong/HAL/Inc/platform_motor.h:
 D:/documentss/cosodoluong/Application/Inc/control_app.h:
 D:/documentss/cosodoluong/Application/Inc/pid_controller.h:
+D:/documentss/cosodoluong/HAL/Inc/platform_encoder.h:
+D:/documentss/cosodoluong/MCU_Drivers/Inc/mcu_gpio.h:
+D:/documentss/cosodoluong/MCU_Drivers/Inc/mcu_uart.h:

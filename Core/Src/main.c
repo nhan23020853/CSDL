@@ -1,51 +1,86 @@
 #include "main.h"
-#include "adc.h"
-#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 #include "mcu_encoder.h"
 #include "platform_motor.h"
 #include "control_app.h"
+#include "stm32f4xx_hal.h"
+#include "platform_encoder.h"
+#include "mcu_gpio.h"
+#include "mcu_uart.h"
+#include <stdio.h>
+#include <string.h>
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
+void SystemClock_Config(void);
+
+float Kp = 1.0f, Kd = 0.1f;
+
 int main(void)
 {
-  /* MCU Configuration--------------------------------------------------------*/
   HAL_Init();
   SystemClock_Config();
 
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_ADC1_Init();
   MX_TIM2_Init();
   MX_USART6_UART_Init();
   MX_TIM3_Init();
-  MX_TIM1_Init();
   MX_TIM4_Init();
+  MX_TIM9_Init();
 
-  /* USER CODE BEGIN 2 */
+  // --- KÍCH HOẠT PWM (BẮT BUỘC ĐỂ MOTOR CHẠY) ---
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+
+  MCU_UART_Init();
   MCU_Encoder_Init();
   Platform_Motor_Init();
   ControlApp_Init();
 
-  HAL_TIM_Base_Start_IT(&htim4);
-  /* USER CODE END 2 */
+  // Bật Driver Motor (STBY lên mức cao)
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
-  /* Infinite loop */
+  // Kích hoạt ngắt PID
+  HAL_TIM_Base_Start_IT(&htim9);
+
+  static uint32_t last_uart_time = 0;
+  static uint32_t last_btn_time = 0;
+
   while (1)
   {
-    /* USER CODE END WHILE */
+      // --- LOGIC NÚT BẤM (KHÔNG DÙNG DELAY) ---
+      if (HAL_GetTick() - last_btn_time > 150) {
+          last_btn_time = HAL_GetTick();
+
+          if (MCU_GPIO_ReadButton(1) == 0) { // Giữ nút 1: Chỉnh Kp
+              if (MCU_GPIO_ReadButton(3) == 0) Kp += 0.1f;
+              if (MCU_GPIO_ReadButton(4) == 0) Kp -= 0.1f;
+          }
+          else if (MCU_GPIO_ReadButton(2) == 0) { // Giữ nút 2: Chỉnh Kd
+              if (MCU_GPIO_ReadButton(3) == 0) Kd += 0.01f;
+              if (MCU_GPIO_ReadButton(4) == 0) Kd -= 0.01f;
+          }
+
+          if (Kp < 0) Kp = 0;
+          if (Kd < 0) Kd = 0;
+      }
+
+      // Đẩy PID vào thuật toán
+      ControlApp_UpdatePID(Kp, Kd);
+
+      // --- TELEMETRY ---
+      if (HAL_GetTick() - last_uart_time > 500) {
+          last_uart_time = HAL_GetTick();
+          char uart_buf[128];
+          sprintf(uart_buf, "Spd_L: %d | Spd_R: %d | Kp: %.2f | Kd: %.2f\r\n",
+                  (int)Platform_Encoder_GetRPM(0),
+                  (int)Platform_Encoder_GetRPM(1),
+                  Kp, Kd);
+          MCU_UART_Send((uint8_t*)uart_buf, strlen(uart_buf));
+      }
   }
 }
 
-/**
-  * @brief System Clock Configuration
-  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -58,10 +93,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  HAL_RCC_OscConfig(&RCC_OscInitStruct);
 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -69,26 +101,15 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0);
 }
 
-/* USER CODE BEGIN 4 */
-// Đảm bảo ngắt định thời gọi hàm Control Loop của bạn
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (htim->Instance == TIM4)
+  if (htim->Instance == TIM9)
   {
     ControlApp_ControlLoop_ISR();
   }
 }
-/* USER CODE END 4 */
 
-void Error_Handler(void)
-{
-  __disable_irq();
-  while (1) { }
-}
+void Error_Handler(void) { while (1) { } }

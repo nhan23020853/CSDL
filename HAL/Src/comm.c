@@ -4,7 +4,8 @@
 #include <stddef.h>
 
 #define QUEUE_SIZE 8
-uint8_t rx_byte;
+
+// Bỏ biến rx_byte toàn cục vì không cần thiết nữa
 
 static FrameType_t rx_queue[QUEUE_SIZE];
 static volatile uint8_t rx_head = 0, rx_tail = 0, rx_count = 0;
@@ -118,13 +119,24 @@ void Comm_Process(void) {
         tx_count--;
         __enable_irq();
 
-        // Gửi header (5 bytes) + payload + CRC (1 byte)
-        MCU_UART_Send((uint8_t*)&f, 5 + f.len + 1);
-    }
-}
-void USART6_IRQHandler(void) {
-    if (USART6->SR & USART_SR_RXNE) {
-        rx_byte = USART6->DR;
-        Comm_ReceiveByte(rx_byte);
+        // ĐÓNG GÓI LẠI BUFFER TRƯỚC KHI GỬI (FIX LỖI)
+        uint8_t tx_buf[MAX_PAYLOAD_SIZE + 6];
+
+        tx_buf[0] = SOF_BYTE;              // Byte 0: Mã SOF
+        tx_buf[1] = f.Type_GID;            // Byte 1: Nhóm lệnh
+        tx_buf[2] = f.ID;                  // Byte 2: ID thiết bị
+        tx_buf[3] = f.len & 0xFF;          // Byte 3: Độ dài LSB
+        tx_buf[4] = (f.len >> 8) & 0xFF;   // Byte 4: Độ dài MSB
+
+        // Byte 5 trở đi: Payload
+        for(uint16_t i = 0; i < f.len; i++) {
+            tx_buf[5 + i] = f.payload[i];
+        }
+
+        // Byte cuối cùng: CRC
+        tx_buf[5 + f.len] = f.crc_check;
+
+        // Gửi qua UART: 1 SOF + 4 Header + Payload + 1 CRC = 6 + f.len
+        MCU_UART_Send(tx_buf, 6 + f.len);
     }
 }

@@ -1,2 +1,2 @@
-../MCU_Drivers/Src/mcu_encoder.c:7:6:MCU_Encoder_Init	8	static
-../MCU_Drivers/Src/mcu_encoder.c:12:10:MCU_Encoder_GetCount	16	static
+../MCU_Drivers/Src/mcu_encoder.c:9:6:MCU_Encoder_Init	8	static
+../MCU_Drivers/Src/mcu_encoder.c:14:10:MCU_Encoder_GetCount	16	static

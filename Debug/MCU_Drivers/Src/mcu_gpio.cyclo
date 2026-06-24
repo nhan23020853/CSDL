@@ -1,2 +1,2 @@
 ../MCU_Drivers/Src/mcu_gpio.c:4:6:MCU_GPIO_Init	1
-../MCU_Drivers/Src/mcu_gpio.c:16:9:MCU_GPIO_ReadButton	5
+../MCU_Drivers/Src/mcu_gpio.c:36:9:MCU_GPIO_ReadButton	6

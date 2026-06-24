@@ -50,6 +50,19 @@ void ControlApp_ControlLoop_ISR(void) {
         float pwm = PID_Compute(&wheels[i].pid, wheels[i].target_rpm, wheels[i].current_rpm);
         Platform_Motor_SetDuty(i, (uint16_t)pwm);
     }
-    // Gửi Telemetry của bánh 0 (Trái) làm đại diện
-    Protocol_SendTelemetry(wheels[0].current_rpm, wheels[0].pid.Kp, wheels[0].pid.Ki, wheels[0].pid.Kd);
+
+    static uint8_t counter = 0;
+    if (++counter >= 10) {
+        counter = 0;
+        Protocol_SendTelemetry(wheels[0].current_rpm, wheels[1].current_rpm,
+                               wheels[0].pid.Kp, wheels[0].pid.Kd);
+    }
+}
+void ControlApp_UpdatePID(float kp, float kd) {
+    __disable_irq();
+    for(int i = 0; i < 2; i++) {
+        wheels[i].pid.Kp = kp;
+        wheels[i].pid.Kd = kd;
+    }
+    __enable_irq();
 }

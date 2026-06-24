@@ -1,47 +1,33 @@
-import socket
-import struct
+import serial
 import time
 
-ESP_IP = '192.168.4.1'
-PORT = 8080
+# Đổi lại tên cổng COM và Baudrate cho đúng với máy của bạn
+COM_PORT = 'COM12' 
+BAUD_RATE = 115200
 
-def read_exact(sock, length):
-    data = b''
-    while len(data) < length:
-        packet = sock.recv(length - len(data))
-        if not packet: return None
-        data += packet
-    return data
-
-while True:
+def main():
     try:
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.settimeout(3.0) 
-        client.connect((ESP_IP, PORT))
-        client.settimeout(None) 
-        print("[OK] Đã kết nối WiFi. Đang lắng nghe Telemetry...")
-
+        # Mở cổng Serial
+        ser = serial.Serial(COM_PORT, BAUD_RATE, timeout=1)
+        print(f"[*] Đã kết nối thành công tới {COM_PORT}.")
+        print("[*] Đang đọc dữ liệu...\n" + "-"*40)
+        
         while True:
-            sof = read_exact(client, 1)
-            if not sof: break 
-                
-            if sof == b'\xaa':
-                rest = read_exact(client, 18)
-                if not rest: break
+            # Đọc từng dòng dữ liệu (nhận diện bằng ký tự \n)
+            if ser.in_waiting > 0:
+                line = ser.readline()
+                try:
+                    # Giải mã byte thành chuỗi String và in ra
+                    decoded_line = line.decode('utf-8').strip()
+                    print(decoded_line)
+                except UnicodeDecodeError:
+                    pass # Bỏ qua nếu có byte rác lúc mới cắm dây
                     
-                msg_id, length = rest[0], rest[1]
-                payload = rest[2:16]
-                checksum_byte, eof_byte = rest[16], rest[17:18]
-                
-                if eof_byte == b'\x55' and msg_id == 1 and length == 14:
-                    calc_cs = msg_id ^ length
-                    for b in payload: calc_cs ^= b
-                        
-                    if calc_cs == checksum_byte:
-                        sensors = struct.unpack('>HHHHH', payload[:10])
-                        line_error = struct.unpack('<f', payload[10:14])[0]
-                        print(f"Cam bien: {sensors} | Loi (Error): {line_error:+.2f}")
+    except serial.SerialException:
+        print(f"[!] Không thể mở cổng {COM_PORT}. Hãy kiểm tra lại dây cắm!")
+    except KeyboardInterrupt:
+        print("\n[*] Đã đóng chương trình.")
+        ser.close()
 
-    except Exception as e:
-        print(f"[CẢNH BÁO] Rớt kết nối ({e}). Đang thử lại...")
-        time.sleep(2)
+if __name__ == "__main__":
+    main()
