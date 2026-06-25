@@ -5,8 +5,6 @@
 
 #define QUEUE_SIZE 8
 
-// Bỏ biến rx_byte toàn cục vì không cần thiết nữa
-
 static FrameType_t rx_queue[QUEUE_SIZE];
 static volatile uint8_t rx_head = 0, rx_tail = 0, rx_count = 0;
 
@@ -25,7 +23,9 @@ static uint8_t Calc_CRC(FrameType_t *f) {
     return crc;
 }
 
-void Comm_RegisterRxCallback(Comm_RxCallback_t cb) { p_RxCallback = cb; }
+void Comm_RegisterRxCallback(Comm_RxCallback_t cb) {
+	p_RxCallback = cb;
+}
 
 void Comm_ReceiveByte(uint8_t byte) {
     switch (rx_state) {

@@ -1,6 +1,6 @@
 #include "mcu_encoder.h"
-#include "stm32f4xx_hal.h"  // <--- BẮT BUỘC PHẢI CÓ DÒNG NÀY (để có TIM_HandleTypeDef)
-#include <stdint.h>         // <--- BẮT BUỘC PHẢI CÓ DÒNG NÀY (để có uint16_t, uint8_t)
+#include "stm32f4xx_hal.h"
+#include <stdint.h>
 
 // Khai báo extern các Timer bạn dùng
 extern TIM_HandleTypeDef htim3; // Encoder Trái

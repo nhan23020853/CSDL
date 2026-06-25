@@ -8,6 +8,7 @@
 #include <string.h>
 
 static Wheel_t wheels[2];
+static uint8_t is_pid_mode = 1;
 
 static void OnFrameReceived(FrameType_t *rx) {
     if (rx->ID == 0x20 && rx->len >= 16) {
@@ -25,8 +26,9 @@ static void OnFrameReceived(FrameType_t *rx) {
 
 void ControlApp_Init(void) {
     for(int i = 0; i < 2; i++) {
-        PID_Init(&wheels[i].pid, 1.0f, 0.0f, 0.01f, 0.01f);
-        wheels[i].target_rpm = 50.0f;
+        // Khởi tạo PID ban đầu, giữ Ki = 2.0f chạy ngầm để bù sai số lệch bánh
+        PID_Init(&wheels[i].pid, 0.4f, 2.0f, 0.0f, 0.01f);
+        wheels[i].target_rpm = 20.0f; // Tốc độ thấp an toàn
     }
     Platform_Button_Init();
     Platform_Encoder_Init();
@@ -47,8 +49,19 @@ void ControlApp_SetWheelParameters(uint8_t idx, float t, float kp, float ki, flo
 void ControlApp_ControlLoop_ISR(void) {
     for(int i = 0; i < 2; i++) {
         wheels[i].current_rpm = Platform_Encoder_GetRPM(i);
-        float pwm = PID_Compute(&wheels[i].pid, wheels[i].target_rpm, wheels[i].current_rpm);
-        Platform_Motor_SetDuty(i, (uint16_t)pwm);
+
+        float pwm = 0.0f;
+
+        if (is_pid_mode == 1) {
+            pwm = PID_Compute(&wheels[i].pid, wheels[i].target_rpm, wheels[i].current_rpm);
+        } else {
+            pwm = 25.0f; // Chế độ chạy thô không PID
+        }
+
+        if (pwm > 100.0f)  pwm = 100.0f;
+        if (pwm < -100.0f) pwm = -100.0f;
+
+        Platform_Motor_SetDuty(i, pwm);
     }
 
     static uint8_t counter = 0;
@@ -58,6 +71,22 @@ void ControlApp_ControlLoop_ISR(void) {
                                wheels[0].pid.Kp, wheels[0].pid.Kd);
     }
 }
+
+void ControlApp_TogglePIDMode(void) {
+    __disable_irq();
+    if (is_pid_mode == 1) {
+        is_pid_mode = 0;
+        for(int i = 0; i < 2; i++) {
+            wheels[i].pid.integral = 0.0f;
+            wheels[i].pid.prev_error = 0.0f;
+        }
+    } else {
+        is_pid_mode = 1;
+    }
+    __enable_irq();
+}
+
+// Hàm quay trở lại chỉ cập nhật Kp và Kd từ nút bấm, giữ nguyên Ki ngầm định
 void ControlApp_UpdatePID(float kp, float kd) {
     __disable_irq();
     for(int i = 0; i < 2; i++) {
@@ -65,4 +94,9 @@ void ControlApp_UpdatePID(float kp, float kd) {
         wheels[i].pid.Kd = kd;
     }
     __enable_irq();
+}
+
+float ControlApp_GetCurrentRPM(uint8_t id) {
+    if (id > 1) return 0.0f;
+    return wheels[id].current_rpm;
 }

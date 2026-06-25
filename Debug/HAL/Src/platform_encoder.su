@@ -1,2 +1,2 @@
 ../HAL/Src/platform_encoder.c:15:6:Platform_Encoder_Init	8	static
-../HAL/Src/platform_encoder.c:21:7:Platform_Encoder_GetRPM	24	static
+../HAL/Src/platform_encoder.c:23:7:Platform_Encoder_GetRPM	24	static

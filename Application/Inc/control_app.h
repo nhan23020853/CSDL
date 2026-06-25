@@ -11,6 +11,8 @@ typedef struct {
 void ControlApp_Init(void);
 void ControlApp_ControlLoop_ISR(void);
 void ControlApp_SetWheelParameters(uint8_t wheel_idx, float target, float kp, float ki, float kd);
+void ControlApp_TogglePIDMode(void);
 void ControlApp_UpdatePID(float kp, float kd);
+float ControlApp_GetCurrentRPM(uint8_t id);
 
 #endif

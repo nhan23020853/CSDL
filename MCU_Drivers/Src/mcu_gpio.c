@@ -6,7 +6,7 @@ void MCU_GPIO_Init(void) {
     RCC->AHB1ENR |= (1U << 0) | (1U << 1) | (1U << 2);
 
     // 2. Cấu hình Driver Motor làm OUTPUT
-    // AIN1: PA4, AIN2: PC0 (MỚI), STBY: PA10, BIN1: PB10, BIN2: PB15
+    // AIN1: PA4, AIN2: PC0, STBY: PA10, BIN1: PB10, BIN2: PB15
 
     // Clear PA4, PA10, PC0
     GPIOA->MODER &= ~((3U << 8) | (3U << 20));
@@ -37,7 +37,7 @@ uint8_t MCU_GPIO_ReadButton(uint8_t btn_id) {
     if (btn_id == 1) return (GPIOB->IDR & (1U << 0)) ? 1 : 0; // PB0
     if (btn_id == 2) return (GPIOB->IDR & (1U << 1)) ? 1 : 0; // PB1
     if (btn_id == 3) return (GPIOB->IDR & (1U << 2)) ? 1 : 0; // PB2
-    if (btn_id == 4) return (GPIOB->IDR & (1U << 4)) ? 1 : 0; // PB4 (MỚI)
+    if (btn_id == 4) return (GPIOB->IDR & (1U << 4)) ? 1 : 0; // PB4
     if (btn_id == 0) return (GPIOC->IDR & (1U << 13)) ? 1 : 0; // PC13
     return 1;
 }

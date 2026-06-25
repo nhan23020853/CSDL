@@ -14,7 +14,7 @@
 
 void SystemClock_Config(void);
 
-float Kp = 1.0f, Kd = 0.1f;
+float Kp = 0.4f, Kd = 0.0f;
 
 int main(void)
 {
@@ -28,7 +28,6 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM9_Init();
 
-  // --- KÍCH HOẠT PWM (BẮT BUỘC ĐỂ MOTOR CHẠY) ---
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
@@ -37,10 +36,7 @@ int main(void)
   Platform_Motor_Init();
   ControlApp_Init();
 
-  // Bật Driver Motor (STBY lên mức cao)
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-
-  // Kích hoạt ngắt PID
   HAL_TIM_Base_Start_IT(&htim9);
 
   static uint32_t last_uart_time = 0;
@@ -48,37 +44,54 @@ int main(void)
 
   while (1)
   {
-      // --- LOGIC NÚT BẤM (KHÔNG DÙNG DELAY) ---
+      // --- LOGIC NÚT BẤM (Nút 1 chỉnh Kp, Nút 2 chỉnh Kd) ---
       if (HAL_GetTick() - last_btn_time > 150) {
           last_btn_time = HAL_GetTick();
+          uint8_t pid_changed = 0;
 
           if (MCU_GPIO_ReadButton(1) == 0) { // Giữ nút 1: Chỉnh Kp
-              if (MCU_GPIO_ReadButton(3) == 0) Kp += 0.1f;
-              if (MCU_GPIO_ReadButton(4) == 0) Kp -= 0.1f;
+              if (MCU_GPIO_ReadButton(3) == 0) { Kp += 0.1f; pid_changed = 1; }
+              if (MCU_GPIO_ReadButton(4) == 0) { Kp -= 0.1f; pid_changed = 1; }
           }
-          else if (MCU_GPIO_ReadButton(2) == 0) { // Giữ nút 2: Chỉnh Kd
-              if (MCU_GPIO_ReadButton(3) == 0) Kd += 0.01f;
-              if (MCU_GPIO_ReadButton(4) == 0) Kd -= 0.01f;
+          else if (MCU_GPIO_ReadButton(2) == 0) { // Giữ nút 2: Chỉnh Kd trở lại
+              if (MCU_GPIO_ReadButton(3) == 0) { Kd += 0.1f; pid_changed = 1; }
+              if (MCU_GPIO_ReadButton(4) == 0) { Kd -= 0.1f; pid_changed = 1; }
           }
 
           if (Kp < 0) Kp = 0;
           if (Kd < 0) Kd = 0;
+
+          if (pid_changed) {
+              ControlApp_UpdatePID(Kp, Kd);
+          }
       }
 
-      // Đẩy PID vào thuật toán
-      ControlApp_UpdatePID(Kp, Kd);
-
-      // --- TELEMETRY ---
       if (HAL_GetTick() - last_uart_time > 500) {
           last_uart_time = HAL_GetTick();
           char uart_buf[128];
+
           sprintf(uart_buf, "Spd_L: %d | Spd_R: %d | Kp: %.2f | Kd: %.2f\r\n",
-                  (int)Platform_Encoder_GetRPM(0),
-                  (int)Platform_Encoder_GetRPM(1),
+                  (int)ControlApp_GetCurrentRPM(0),
+                  (int)ControlApp_GetCurrentRPM(1),
                   Kp, Kd);
+
           MCU_UART_Send((uint8_t*)uart_buf, strlen(uart_buf));
       }
   }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == GPIO_PIN_13)
+    {
+        static uint32_t last_interrupt_time = 0;
+        uint32_t current_time = HAL_GetTick();
+
+        if ((current_time - last_interrupt_time) > 250) {
+            ControlApp_TogglePIDMode();
+            last_interrupt_time = current_time;
+        }
+    }
 }
 
 void SystemClock_Config(void)
